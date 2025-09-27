@@ -1,0 +1,623 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="1894.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+    span.s1 {font: 12.0px 'Apple Color Emoji'}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="fr"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Réservation de Séances d'Appel d'Offres&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Firebase --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"&gt;&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Export PDF et Excel --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"&gt;&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// CONFIGURATION FIREBASE</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const firebaseConfig = {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>apiKey: "AIzaSyC6WcdZ3WA4Nk5iJcjTkxc0WB8WzHIpBpE",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>authDomain: "reservations-app-b4691.firebaseapp.com",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>projectId: "reservations-app-b4691",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>storageBucket: "reservations-app-b4691.firebasestorage.app",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>messagingSenderId: "153859745731",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>appId: "1:153859745731:web:1cfeb3a756e6d1154d7f76"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Initialiser Firebase</p>
+<p class="p1"><span class="Apple-converted-space">        </span>firebase.initializeApp(firebaseConfig);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const db = firebase.firestore();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>tailwind.config = {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>theme: {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>extend: {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>colors: {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>primary: { light: '#4F46E5', DEFAULT: '#4338CA', dark: '#3730A3' },</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>secondary: { light: '#10B981', DEFAULT: '#059669', dark: '#047857' },</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>accent: { light: '#F59E0B', DEFAULT: '#D97706', dark: '#B45309' },</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>gray: { lightest: '#F9FAFB', lighter: '#F3F4F6', light: '#E5E7EB', DEFAULT: '#D1D5DB', dark: '#6B7280', darker: '#4B5563', darkest: '#1F2937' }</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>boxShadow: { 'soft': '0 4px 20px rgba(0, 0, 0, 0.08)', 'hard': '0 4px 20px rgba(0, 0, 0, 0.15)' }</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: 'Inter', sans-serif; background-color: #F9FAFB; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.18); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.unavailable { background-color: #F3F4F6; color: #9CA3AF; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.holiday { background-color: #FBBF24; color: #78350F; font-weight: 600; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.selected { background-color: #4F46E5; color: white; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.calendar-day { min-height: 100px; transition: all 0.2s; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.calendar-day:hover:not(.unavailable):not(.holiday):not(.border-primary) { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.gantt-bar { height: 20px; background: linear-gradient(90deg, #4F46E5, #7C3AED); border-radius: 4px; margin-top: 5px; position: relative; transition: all 0.2s; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.gantt-bar:hover { transform: scaleY(1.1); box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.gantt-label { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: white; font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 16px); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.tooltip { position: absolute; z-index: 100; background: rgba(31, 41, 55, 0.95); color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; pointer-events: none; display: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.1); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.btn-primary { background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; transition: all 0.2s; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.btn-secondary { background: linear-gradient(135deg, #10B981, #059669); color: white; transition: all 0.2s; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-field { transition: all 0.2s; border: 1px solid #E5E7EB; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-field:focus { border-color: #A5B4FC; box-shadow: 0 0 0 3px rgba(199, 210, 254, 0.5); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#month-list { max-height: 250px; overflow-y: auto; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 768px) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.calendar-day { min-height: 70px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body class="bg-gray-50"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="container mx-auto px-4 py-8 max-w-7xl"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;header class="mb-10 bg-gradient-to-r from-primary to-indigo-700 rounded-xl p-6 text-white shadow-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex justify-between items-start"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h1 class="text-3xl font-bold mb-2"&gt;Réservation de Séances&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p class="text-indigo-100"&gt;Planifiez vos consultations d'appels d'offres en toute simplicité&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex items-center space-x-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="auth-status" class="bg-green-500/20 p-2 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas fa-user text-xl"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span id="user-email" class="text-sm ml-2"&gt;Connecté à Firebase&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="grid grid-cols-1 lg:grid-cols-3 gap-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Formulaire de réservation --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="lg:col-span-1 bg-white rounded-2xl p-6 shadow-xl glass-card order-2 lg:order-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="text-xl font-semibold mb-6 text-gray-800 flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;i class="fas fa-plus-circle text-primary mr-3"&gt;&lt;/i&gt; Nouvelle Réservation</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/h2&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="grid grid-cols-2 gap-4 mb-6" id="date-selectors-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label for="year-select" class="block text-sm font-medium text-gray-700 mb-2 flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="fas fa-calendar-year text-gray-500 mr-2"&gt;&lt;/i&gt; Année</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select id="year-select" class="w-full p-3 border border-gray-200 rounded-lg input-field"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="2025"&gt;2025&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="2026"&gt;2026&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="2027"&gt;2027&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                         </span>&lt;label for="month-selector-btn" class="block text-sm font-medium text-gray-700 mb-2 flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="far fa-calendar text-gray-500 mr-2"&gt;&lt;/i&gt; Mois</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button id="month-selector-btn" class="w-full p-3 border border-gray-200 rounded-lg input-field text-left flex justify-between items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span id="month-selector-text"&gt;Janvier&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div id="month-list" class="hidden absolute z-20 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 p-2"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mb-6 bg-white p-4 rounded-xl shadow-soft"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h3 class="text-lg font-semibold text-gray-800 flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="far fa-calendar text-primary mr-2"&gt;&lt;/i&gt; Calendrier<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span id="calendar-title-month-year" class="ml-2 text-base text-gray-600 font-medium"&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex space-x-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button id="prev-month" class="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-primary transition"&gt;&lt;i class="fas fa-chevron-left"&gt;&lt;/i&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button id="next-month" class="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-primary transition"&gt;&lt;i class="fas fa-chevron-right"&gt;&lt;/i&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="grid grid-cols-7 gap-1 mb-3 text-center text-xs font-medium text-gray-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;Lun&lt;/div&gt;&lt;div&gt;Mar&lt;/div&gt;&lt;div&gt;Mer&lt;/div&gt;&lt;div&gt;Jeu&lt;/div&gt;&lt;div&gt;Ven&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="text-gray-400"&gt;Sam&lt;/div&gt;&lt;div class="text-gray-400"&gt;Dim&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="calendar-grid" class="grid grid-cols-7 gap-1"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label class="block text-sm font-medium text-gray-700 mb-2 flex items-center"&gt;&lt;i class="far fa-calendar-check text-gray-500 mr-2"&gt;&lt;/i&gt; Date sélectionnée&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" id="selected-date" class="w-full p-3 border border-gray-200 rounded-lg bg-gray-50 input-field" readonly&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="grid grid-cols-2 gap-4 mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label for="start-hour" class="block text-sm font-medium text-gray-700 mb-2 flex items-center"&gt;&lt;i class="far fa-clock text-gray-500 mr-2"&gt;&lt;/i&gt; Heure de début&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="start-hour" class="w-1/2 p-3 border border-gray-200 rounded-lg input-field"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="start-minute" class="w-1/2 p-3 border border-gray-200 rounded-lg input-field"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label for="end-hour" class="block text-sm font-medium text-gray-700 mb-2 flex items-center"&gt;&lt;i class="fas fa-clock text-gray-500 mr-2"&gt;&lt;/i&gt; Heure de fin&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="end-hour" class="w-1/2 p-3 border border-gray-200 rounded-lg input-field"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="end-minute" class="w-1/2 p-3 border border-gray-200 rounded-lg input-field"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="ao-reference" class="block text-sm font-medium text-gray-700 mb-2 flex items-center"&gt;&lt;i class="fas fa-hashtag text-gray-500 mr-2"&gt;&lt;/i&gt; Référence AO&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" id="ao-reference" class="w-full p-3 border border-gray-200 rounded-lg input-field" placeholder="Ex: AO-2025-001"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="ao-object" class="block text-sm font-medium text-gray-700 mb-2 flex items-center"&gt;&lt;i class="fas fa-align-left text-gray-500 mr-2"&gt;&lt;/i&gt; Objet de l'appel d'offres&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" id="ao-object" class="w-full p-3 border border-gray-200 rounded-lg input-field" placeholder="Objet de l'appel d'offres"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mb-4 hidden" id="conflict-alert"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-start bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas fa-exclamation-triangle text-red-500 mt-1 mr-3"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p id="conflict-message" class="font-medium"&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-sm mt-1"&gt;Veuillez choisir une autre plage horaire.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex justify-between space-x-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button id="show-holidays" class="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex-1 flex items-center justify-center"&gt;&lt;i class="fas fa-calendar-day mr-2"&gt;&lt;/i&gt; Jours fériés&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button id="book-session" class="px-5 py-3 btn-primary rounded-lg flex-1 flex items-center justify-center"&gt;&lt;i class="fas fa-calendar-plus mr-2"&gt;&lt;/i&gt; Réserver&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Planning --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="lg:col-span-2 order-1 lg:order-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-2xl p-6 shadow-xl glass-card h-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-center mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 class="text-xl font-semibold text-gray-800 flex items-center"&gt;&lt;i class="fas fa-chart-bar text-primary mr-3"&gt;&lt;/i&gt; Planning des Réservations&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button id="view-gantt" class="px-5 py-2.5 btn-secondary rounded-lg flex items-center"&gt;&lt;i class="fas fa-table mr-2"&gt;&lt;/i&gt; Voir toutes&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="gantt-chart" class="bg-gray-50/50 p-4 rounded-xl"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="tooltip" class="tooltip"&gt;&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Modals --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="holidays-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto glass-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3 class="text-lg font-semibold text-gray-800 flex items-center"&gt;&lt;i class="fas fa-umbrella-beach text-accent mr-2"&gt;&lt;/i&gt; Jours fériés &lt;span id="holidays-year"&gt;&lt;/span&gt;&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button id="close-holidays-modal" class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"&gt;&lt;i class="fas fa-times"&gt;&lt;/i&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="holidays-list" class="divide-y divide-gray-200"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="bookings-table-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="bg-white rounded-2xl p-6 w-full max-w-6xl max-h-[80vh] overflow-y-auto glass-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3 class="text-lg font-semibold text-gray-800 flex items-center"&gt;&lt;i class="fas fa-list-ol text-primary mr-2"&gt;&lt;/i&gt; Toutes les réservations&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button id="close-bookings-table-modal" class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"&gt;&lt;i class="fas fa-times"&gt;&lt;/i&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="overflow-x-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;table class="min-w-full divide-y divide-gray-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;thead class="bg-gray-50"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;N°&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Référence AO&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Objet&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Date&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Heure début&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Heure fin&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Actions&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;tbody id="bookings-table-body" class="bg-white divide-y divide-gray-200"&gt;&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="mt-4 flex justify-end space-x-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button id="export-pdf" class="px-4 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center"&gt;&lt;i class="fas fa-file-pdf mr-2"&gt;&lt;/i&gt;PDF&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button id="export-excel" class="px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center"&gt;&lt;i class="fas fa-file-excel mr-2"&gt;&lt;/i&gt;Excel&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// VARIABLES GLOBALES</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let bookings = [];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let holidays = {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>'2025': [<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-01-01', name: 'Nouvel an' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-01-11', name: 'Manifeste de l\'Indépendance' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-01-14', name: 'Nouvel An Amazigh' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-03-31', name: 'Aid Al Fitr (Jour 1)' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-04-01', name: 'Aid Al Fitr (Jour 2)' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-05-01', name: 'Fête du Travail' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-06-06', name: 'Aid Al Addha (Jour 1)' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-06-07', name: 'Aid Al Addha (Jour 2)' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-06-27', name: '1er Moharram' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-07-30', name: 'Fête du Trône' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-08-14', name: 'Récupération de Oued Eddahab' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-08-20', name: 'Révolution du Roi et du Peuple' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-08-21', name: 'Fête de la Jeunesse' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-09-05', name: 'Aid Al Mawlid' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-11-06', name: 'Marche Verte' },<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ date: '2025-11-18', name: 'Fête de l\'Indépendance' }<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>]<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let currentDate = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let selectedDate = null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let selectedStartTime = null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let selectedEndTime = null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let currentYear = new Date().getFullYear();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let currentMonth = currentDate.getMonth();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// ÉLÉMENTS DOM</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const yearSelect = document.getElementById('year-select'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>calendarGrid = document.getElementById('calendar-grid'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>selectedDateInput = document.getElementById('selected-date'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>startHourSelect = document.getElementById('start-hour'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>startMinuteSelect = document.getElementById('start-minute'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>endHourSelect = document.getElementById('end-hour'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>endMinuteSelect = document.getElementById('end-minute'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>aoReferenceInput = document.getElementById('ao-reference'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>aoObjectInput = document.getElementById('ao-object'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>conflictAlert = document.getElementById('conflict-alert'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>conflictMessage = document.getElementById('conflict-message'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>bookSessionBtn = document.getElementById('book-session'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>showHolidaysBtn = document.getElementById('show-holidays'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>viewGanttBtn = document.getElementById('view-gantt'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>prevMonthBtn = document.getElementById('prev-month'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>nextMonthBtn = document.getElementById('next-month'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>holidaysModal = document.getElementById('holidays-modal'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>closeHolidaysModal = document.getElementById('close-holidays-modal'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>holidaysYear = document.getElementById('holidays-year'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>holidaysList = document.getElementById('holidays-list'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>bookingsTableModal = document.getElementById('bookings-table-modal'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>closeBookingsTableModal = document.getElementById('close-bookings-table-modal'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>bookingsTableBody = document.getElementById('bookings-table-body'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>exportPdfBtn = document.getElementById('export-pdf'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>exportExcelBtn = document.getElementById('export-excel'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>ganttChart = document.getElementById('gantt-chart'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>tooltip = document.getElementById('tooltip'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>calendarTitleMonthYear = document.getElementById('calendar-title-month-year'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>monthSelectorBtn = document.getElementById('month-selector-btn'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>monthSelectorText = document.getElementById('month-selector-text'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>monthList = document.getElementById('month-list'),</p>
+<p class="p1"><span class="Apple-converted-space">              </span>dateSelectorsContainer = document.getElementById('date-selectors-container');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// FONCTIONS FIREBASE SIMPLIFIÉES</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function loadBookingsFromFirebase() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('Chargement des données depuis Firebase...');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>db.collection('bookings').get()</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.then((snapshot) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.log('<span class="s1">✅</span> Données reçues de Firebase:', snapshot.size, 'réservations');</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>bookings = [];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>snapshot.forEach((doc) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const data = doc.data();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>bookings.push({</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>id: doc.id,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>...data</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderGanttChart();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showNotification('Données chargées depuis Firebase !', 'success');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>})</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.catch((error) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.error('<span class="s1">❌</span> Erreur Firebase:', error);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showNotification('Mode local activé (erreur Firebase)', 'warning');</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Mode de secours</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const localBookings = JSON.parse(localStorage.getItem('tenderBookings')) || [];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>bookings = localBookings;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderGanttChart();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function addNewBooking() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!selectedDate) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("Veuillez sélectionner une date.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startTime = `${startHourSelect.value}:${startMinuteSelect.value}`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const endTime = `${endHourSelect.value}:${endMinuteSelect.value}`;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (timeToMinutes(startTime) &gt;= timeToMinutes(endTime)) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("L'heure de fin doit être après l'heure de début.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!aoReferenceInput.value.trim() || !aoObjectInput.value.trim()) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("Référence et Objet sont requis.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (checkForConflicts()) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("Conflit d'horaire détecté.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const bookingData = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>date: formatDateForComparison(selectedDate),</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startTime: startTime,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endTime: endTime,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>reference: aoReferenceInput.value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                </span>object: aoObjectInput.value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                </span>createdAt: new Date().toISOString()</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Sauvegarde dans Firebase</p>
+<p class="p1"><span class="Apple-converted-space">            </span>db.collection('bookings').add(bookingData)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.then((docRef) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.log('<span class="s1">✅</span> Réservation sauvegardée dans Firebase, ID:', docRef.id);</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Ajouter aussi en local pour l'affichage immédiat</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>bookings.push({</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>id: docRef.id,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>...bookingData</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>aoReferenceInput.value = "";</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>aoObjectInput.value = "";</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderGanttChart();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showNotification("Réservation enregistrée dans Firebase !", "success");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>})</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.catch((error) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.error('<span class="s1">❌</span> Erreur Firebase:', error);</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Sauvegarde de secours en local</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const localBooking = {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>id: Date.now(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>...bookingData</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>bookings.push(localBooking);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>saveBookingsToLocal();</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>aoReferenceInput.value = "";</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>aoObjectInput.value = "";</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderGanttChart();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showNotification("Réservation enregistrée (mode local)", "warning");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateExistingBooking() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const bookingId = window.editingBookingId;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const bookingIndex = bookings.findIndex(booking =&gt; booking.id === bookingId);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (bookingIndex === -1) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>resetBookingFormState();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("Erreur: Réservation non trouvée.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!selectedDate) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("Veuillez sélectionner une date.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startTime = `${startHourSelect.value}:${startMinuteSelect.value}`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const endTime = `${endHourSelect.value}:${endMinuteSelect.value}`;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (timeToMinutes(startTime) &gt;= timeToMinutes(endTime)) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("L'heure de fin doit être après l'heure de début.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!aoReferenceInput.value.trim() || !aoObjectInput.value.trim()) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("Référence et Objet sont requis.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (checkForConflicts()) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification("Conflit d'horaire détecté.", "error");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const updatedData = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>date: formatDateForComparison(selectedDate),</p>
+<p class="p1"><span class="Apple-converted-space">                </span>startTime: startTime,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>endTime: endTime,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>reference: aoReferenceInput.value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                </span>object: aoObjectInput.value.trim(),</p>
+<p class="p1"><span class="Apple-converted-space">                </span>updatedAt: new Date().toISOString()</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Mise à jour dans Firebase</p>
+<p class="p1"><span class="Apple-converted-space">            </span>db.collection('bookings').doc(bookingId).update(updatedData)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.then(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.log('<span class="s1">✅</span> Réservation modifiée dans Firebase');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>bookings[bookingIndex] = { ...bookings[bookingIndex], ...updatedData };</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>resetBookingFormState();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderGanttChart();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showNotification("Réservation modifiée dans Firebase !", "success");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>})</p>
+<p class="p1"><span class="Apple-converted-space">                </span>.catch((error) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.error('<span class="s1">❌</span> Erreur Firebase:', error);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Mise à jour locale de secours</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>bookings[bookingIndex] = { ...bookings[bookingIndex], ...updatedData };</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>saveBookingsToLocal();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>resetBookingFormState();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderGanttChart();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showNotification("Réservation modifiée (mode local)", "warning");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.deleteBooking = function(bookingId) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (window.editingBookingId === bookingId) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>resetBookingFormState();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (confirm("Êtes-vous sûr de vouloir supprimer cette réservation ?")) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Suppression dans Firebase</p>
+<p class="p1"><span class="Apple-converted-space">                </span>db.collection('bookings').doc(bookingId).delete()</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.then(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>console.log('<span class="s1">✅</span> Réservation supprimée de Firebase');</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>bookings = bookings.filter(booking =&gt; booking.id !== bookingId);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderGanttChart();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (!bookingsTableModal.classList.contains("hidden")) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>showBookingsTable();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showNotification("Réservation supprimée de Firebase !", "success");</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>})</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.catch((error) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>console.error('<span class="s1">❌</span> Erreur Firebase:', error);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Suppression locale de secours</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>bookings = bookings.filter(booking =&gt; booking.id !== bookingId);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>saveBookingsToLocal();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderGanttChart();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (!bookingsTableModal.classList.contains("hidden")) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>showBookingsTable();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showNotification("Réservation supprimée (mode local)", "warning");</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function saveBookingsToLocal() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>localStorage.setItem("tenderBookings", JSON.stringify(bookings));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// FONCTIONS EXISTANTES (inchangées)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function init(){</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const e=Array.from(yearSelect.options).map(e=&gt;parseInt(e.value));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>e.includes(currentYear)||(currentYear=2025),yearSelect.value=currentYear,currentDate=new Date(currentYear,currentMonth,1),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>yearSelect.addEventListener("change",handleYearChange),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>prevMonthBtn.addEventListener("click",goToPrevMonth),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>nextMonthBtn.addEventListener("click",goToNextMonth),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>bookSessionBtn.addEventListener("click",bookSession),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>showHolidaysBtn.addEventListener("click",showHolidaysModal),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>viewGanttBtn.addEventListener("click",showBookingsTable),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>closeHolidaysModal.addEventListener("click",()=&gt;holidaysModal.classList.add("hidden")),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>closeBookingsTableModal.addEventListener("click",()=&gt;{bookingsTableModal.classList.add("hidden"),resetBookingFormState()}),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>exportPdfBtn.addEventListener("click",exportToPdf),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>exportExcelBtn.addEventListener("click",exportToExcel),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setupMonthSelector(),initializeTimeSelectors(),updateMonthSelectorDisplay(),</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// CHARGER LES DONNÉES AU DÉMARRAGE</p>
+<p class="p1"><span class="Apple-converted-space">            </span>loadBookingsFromFirebase();</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderCalendar(),renderGanttChart()</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function setupMonthSelector(){monthList.innerHTML=monthNames.map((e,t)=&gt;`&lt;div class="p-2 text-sm text-gray-700 rounded-md hover:bg-indigo-50 cursor-pointer" data-month="${t}"&gt;${e}&lt;/div&gt;`).join(""),monthSelectorBtn.addEventListener("click",()=&gt;{monthList.classList.toggle("hidden"),monthSelectorBtn.querySelector("i").classList.toggle("rotate-180")}),monthList.addEventListener("click",e=&gt;{e.target.dataset.month&amp;&amp;(currentMonth=parseInt(e.target.dataset.month),currentDate=new Date(currentYear,currentMonth,1),updateMonthSelectorDisplay(),renderCalendar(),monthList.classList.add("hidden"),monthSelectorBtn.querySelector("i").classList.remove("rotate-180"))}),document.addEventListener("click",e=&gt;{dateSelectorsContainer.contains(e.target)||(monthList.classList.add("hidden"),monthSelectorBtn.querySelector("i").classList.remove("rotate-180"))})}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateMonthSelectorDisplay(){monthSelectorText.textContent=monthNames[currentMonth]}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateCalendarTitle(){calendarTitleMonthYear&amp;&amp;(calendarTitleMonthYear.textContent=`${monthNames[currentMonth]} ${currentYear}`)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function initializeTimeSelectors(){startHourSelect.innerHTML="",startMinuteSelect.innerHTML="",endHourSelect.innerHTML="",endMinuteSelect.innerHTML="";for(let e=8;e&lt;=16;e++){const t=e.toString().padStart(2,"0");startHourSelect.innerHTML+=`&lt;option value="${t}"&gt;${t}&lt;/option&gt;`,endHourSelect.innerHTML+=`&lt;option value="${t}"&gt;${t}&lt;/option&gt;`}for(let e=0;e&lt;60;e++){const t=e.toString().padStart(2,"0");startMinuteSelect.innerHTML+=`&lt;option value="${t}"&gt;${t}&lt;/option&gt;`,endMinuteSelect.innerHTML+=`&lt;option value="${t}"&gt;${t}&lt;/option&gt;`}startHourSelect.value="08",startMinuteSelect.value="00",endHourSelect.value="09",endMinuteSelect.value="00",updateSelectedTimes(),startHourSelect.addEventListener("change",updateSelectedTimes),startMinuteSelect.addEventListener("change",updateSelectedTimes),endHourSelect.addEventListener("change",updateSelectedTimes),endMinuteSelect.addEventListener("change",updateSelectedTimes)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateSelectedTimes(){selectedStartTime=`${startHourSelect.value}:${startMinuteSelect.value}`,selectedEndTime=`${endHourSelect.value}:${endMinuteSelect.value}`,selectedDate&amp;&amp;selectedStartTime&amp;&amp;selectedEndTime&amp;&amp;checkForConflicts()}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function handleYearChange(){currentYear=parseInt(yearSelect.value),holidays[currentYear]||(holidays[currentYear]=[]),currentDate=new Date(currentYear,currentMonth,1),renderCalendar()}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function renderCalendar(){const e=currentDate.getFullYear(),t=currentDate.getMonth();updateCalendarTitle();const o=new Date(e,t,1),n=new Date(e,t+1,0).getDate();let a=o.getDay();a=0===a?6:a-1,calendarGrid.innerHTML="";for(let e=0;e&lt;a;e++)calendarGrid.appendChild(createCalendarCell(""));const s=holidays[e]||[];for(let o=1;o&lt;=n;o++){const n=(new Date(e,t,o)).getDay(),a=0===n||6===n,l=formatDateForComparison(new Date(e,t,o)),c=s.some(e=&gt;e.date===l),d=createCalendarCell(o,new Date(e,t,o),a,c);calendarGrid.appendChild(d)}if(!selectedDate||selectedDate.getMonth()!==t||selectedDate.getFullYear()!==e){const e=calendarGrid.querySelector(".available-day:not(.holiday):not(.unavailable)");e?e.click():(selectedDateInput.value="Aucun jour disponible ce mois-ci",selectedDate=null)}}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function createCalendarCell(e,t=null,o=!1,n=!1){const a=document.createElement("div");if(a.className="border rounded-lg calendar-day p-2 transition",!t)return a.classList.add("bg-gray-50","cursor-default"),a;const s=formatDateForComparison(t);a.dataset.date=s;const l=o||n;if(l)return a.classList.add(n?"holiday":"unavailable","cursor-not-allowed"),a.innerHTML=`\n &lt;div class="text-right text-sm font-medium"&gt;${e}&lt;/div&gt;\n ${n?'&lt;div class="text-xs text-center mt-1"&gt;&lt;i class="fas fa-star"&gt;&lt;/i&gt;&lt;/div&gt;':""}\n `,a;const c=selectedDate&amp;&amp;formatDateForComparison(selectedDate)===s,d=getBookingsForDate(s);return a.className+=` available-day ${c?"border-2 border-primary bg-primary/5":"border-gray-200 hover:bg-indigo-50"} cursor-pointer`,a.innerHTML=`\n &lt;div class="text-right text-sm font-medium ${c?"text-primary":"text-gray-700"}"&gt;${e}&lt;/div&gt;\n &lt;div class="text-xs mt-2 space-y-1 overflow-hidden max-h-12"&gt;\n ${d.slice(0,2).map(e=&gt;`&lt;div class="bg-indigo-100 text-indigo-800 text-xs p-1 rounded truncate" title="${e.reference}: ${e.startTime}-${e.endTime}"&gt;${e.startTime}-${e.endTime}&lt;/div&gt;`).join("")}\n ${d.length&gt;2?'&lt;div class="text-xs text-center text-gray-500"&gt;...&lt;/div&gt;':""}\n &lt;/div&gt;\n `,a.addEventListener("click",()=&gt;{l||(document.querySelectorAll(".available-day").forEach(e=&gt;{e.classList.remove("border-2","border-primary","bg-primary/5"),e.querySelector("div:first-child")&amp;&amp;e.querySelector("div:first-child").classList.remove("text-primary")}),a.classList.add("border-2","border-primary","bg-primary/5"),a.querySelector("div:first-child")&amp;&amp;a.querySelector("div:first-child").classList.add("text-primary"),selectedDate=t,selectedDateInput.value=formatFrenchDate(t),updateSelectedTimes())}),a}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function checkForConflicts(){if(!selectedDate||!selectedStartTime||!selectedEndTime)return conflictAlert.classList.add("hidden"),!1;const e=formatDateForComparison(selectedDate);let t=getBookingsForDate(e);window.editingBookingId&amp;&amp;(t=t.filter(e=&gt;e.id!==window.editingBookingId));const o=timeToMinutes(selectedStartTime),n=timeToMinutes(selectedEndTime);if(o&gt;=n)return conflictMessage.textContent="L'heure de fin doit être après l'heure de début.",conflictAlert.classList.remove("hidden"),!0;for(const a of t){const e=timeToMinutes(a.startTime),t=timeToMinutes(a.endTime);if(o&lt;t&amp;&amp;n&gt;e)return conflictMessage.textContent="Une séance est déjà en cours dans cette plage horaire.",conflictAlert.classList.remove("hidden"),!0}return conflictAlert.classList.add("hidden"),!1}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function timeToMinutes(e){const[t,o]=e.split(":").map(Number);return 60*t+o}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function bookSession(){window.editingBookingId?updateExistingBooking():addNewBooking()}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function resetBookingFormState(){window.editingBookingId=null,bookSessionBtn.innerHTML='&lt;i class="fas fa-calendar-plus mr-2"&gt;&lt;/i&gt; Réserver',conflictAlert.classList.add("hidden")}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function showNotification(e,t="info"){const o={success:"bg-green-500",error:"bg-red-500",info:"bg-blue-500",warning:"bg-yellow-500"},n={success:"fa-check-circle",error:"fa-exclamation-circle",info:"fa-info-circle",warning:"fa-exclamation-triangle"},a=document.createElement("div");a.className=`fixed top-4 right-4 text-white px-4 py-3 rounded-lg shadow-lg flex items-center ${o[t]} z-[100] animate-fade-in-up`,a.innerHTML=`&lt;i class="fas ${n[t]} mr-2"&gt;&lt;/i&gt;&lt;span&gt;${e}&lt;/span&gt;`,document.body.appendChild(a),setTimeout(()=&gt;{a.classList.add("animate-fade-out"),setTimeout(()=&gt;a.remove(),300)},3e3)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function showHolidaysModal(){const e=yearSelect.value;holidaysYear.textContent=e;const t=holidays[e]||[];holidaysList.innerHTML=t.length&gt;0?t.map(e=&gt;`\n &lt;div class="py-3 px-2 hover:bg-gray-50 rounded-lg transition"&gt;\n &lt;div class="font-medium flex items-center"&gt;&lt;i class="fas fa-star text-yellow-400 mr-2 text-sm"&gt;&lt;/i&gt;${e.name}&lt;/div&gt;\n &lt;div class="text-sm text-gray-600 mt-1"&gt;${formatFrenchDate(new Date(e.date.replace(/-/g,"/")))}&lt;/div&gt;\n &lt;/div&gt;`).join(""):`&lt;div class="p-4 text-center text-gray-500"&gt;Aucun jour férié défini.&lt;/div&gt;`,holidaysModal.classList.remove("hidden")}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function showBookingsTable(){window.editingBookingId&amp;&amp;resetBookingFormState(),bookings.length===0?bookingsTableBody.innerHTML='&lt;tr&gt;&lt;td colspan="7" class="px-6 py-4 text-center text-gray-500"&gt;&lt;div class="py-8"&gt;&lt;i class="fas fa-calendar-alt text-3xl text-gray-300 mb-3"&gt;&lt;/i&gt;&lt;p&gt;Aucune réservation&lt;/p&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;':bookingsTableBody.innerHTML=[...bookings].sort((e,t)=&gt;new Date(e.date)-new Date(t.date)||timeToMinutes(e.startTime)-timeToMinutes(t.startTime)).map((e,t)=&gt;`\n &lt;tr class="hover:bg-gray-50 transition"&gt;\n &lt;td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"&gt;${t+1}&lt;/td&gt;\n &lt;td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"&gt;${e.reference}&lt;/td&gt;\n &lt;td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="${e.object}"&gt;${e.object}&lt;/td&gt;\n &lt;td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"&gt;${formatFrenchDate(new Date(e.date.replace(/-/g,"/")))}&lt;/td&gt;\n &lt;td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"&gt;${e.startTime}&lt;/td&gt;\n &lt;td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"&gt;${e.endTime}&lt;/td&gt;\n &lt;td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"&gt;\n &lt;button onclick="editBooking(${e.id})" class="text-indigo-600 hover:text-indigo-900 mr-3" title="Modifier"&gt;&lt;i class="fas fa-edit"&gt;&lt;/i&gt;&lt;/button&gt;\n &lt;button onclick="deleteBooking(${e.id})" class="text-red-600 hover:text-red-900" title="Supprimer"&gt;&lt;i class="fas fa-trash-alt"&gt;&lt;/i&gt;&lt;/button&gt;\n &lt;/td&gt;\n &lt;/tr&gt;`).join(""),bookingsTableModal.classList.remove("hidden")}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function renderGanttChart(){if(bookings.length===0)return void(ganttChart.innerHTML='&lt;div class="text-center py-10 text-gray-400"&gt;&lt;i class="fas fa-calendar-alt text-4xl mb-3"&gt;&lt;/i&gt;&lt;p class="text-lg"&gt;Aucune réservation&lt;/p&gt;&lt;p class="text-sm"&gt;Créez une réservation.&lt;/p&gt;&lt;/div&gt;');const e=[...bookings].sort((e,t)=&gt;new Date(e.date)-new Date(t.date)||timeToMinutes(e.startTime)-timeToMinutes(t.startTime)),t={};e.forEach(e=&gt;{t[e.date]||(t[e.date]=[]),t[e.date].push(e)}),ganttChart.innerHTML=Object.entries(t).map(([e,t])=&gt;{const o=new Date(e.replace(/-/g,"/")),n=formatFrenchDate(o),a=8,s=17,l=s-a;return`\n &lt;div class="mb-8"&gt;\n &lt;div class="font-medium mb-3 text-gray-700 flex items-center"&gt;&lt;i class="far fa-calendar text-primary mr-2"&gt;&lt;/i&gt; ${n}&lt;/div&gt;\n &lt;div class="relative bg-gray-100 rounded overflow-hidden"&gt;\n &lt;div class="absolute top-0 left-0 right-0 h-full flex border-l border-gray-200"&gt;${Array.from({length:l},()=&gt;'&lt;div class="flex-1 border-r border-gray-200"&gt;&lt;/div&gt;').join("")}&lt;/div&gt;\n &lt;div class="relative py-2"&gt;${t.map(e=&gt;{const t=timeToMinutes(e.startTime),o=timeToMinutes(e.endTime),n=(t-60*a)/ (60*l)*100,c=(o-t)/(60*l)*100;return`&lt;div class="gantt-bar" style="left: ${Math.max(0,n)}%; width: ${Math.min(100-Math.max(0,n),c)}%;" data-reference="${e.reference}" data-object="${e.object}" data-time="${e.startTime}-${e.endTime}"&gt;&lt;div class="gantt-label"&gt;${e.reference}&lt;/div&gt;&lt;/div&gt;`}).join("")}&lt;/div&gt;\n &lt;div class="flex justify-between text-xs text-gray-500 mt-1 px-1 border-t border-gray-200 pt-1"&gt;${Array.from({length:l+1},(_,e)=&gt;`&lt;div style="flex-basis: ${100/l}%; text-align: ${0===e?"left":e===l?"right":"center"};"&gt;${a+e}h&lt;/div&gt;`).join("")}&lt;/div&gt;\n &lt;/div&gt;\n &lt;/div&gt;`}).join(""),document.querySelectorAll(".gantt-bar").forEach(e=&gt;{e.addEventListener("mouseenter",t=&gt;{tooltip.innerHTML=`&lt;div class="font-medium mb-1"&gt;${e.dataset.reference}&lt;/div&gt;&lt;div class="text-xs mb-1"&gt;${e.dataset.time}&lt;/div&gt;&lt;div class="text-xs text-gray-300"&gt;${e.dataset.object}&lt;/div&gt;`,tooltip.style.display="block"}),e.addEventListener("mousemove",e=&gt;{tooltip.style.left=`${e.pageX+10}px`,tooltip.style.top=`${e.pageY+10}px`}),e.addEventListener("mouseleave",()=&gt;tooltip.style.display="none")})}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function goToPrevMonth(){currentDate.setMonth(currentDate.getMonth()-1),currentMonth=currentDate.getMonth(),currentYear=currentDate.getFullYear(),yearSelect.value=currentYear,holidays[currentYear]||(holidays[currentYear]=[]),updateMonthSelectorDisplay(),renderCalendar()}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function goToNextMonth(){currentDate.setMonth(currentDate.getMonth()+1),currentMonth=currentDate.getMonth(),currentYear=currentDate.getFullYear(),yearSelect.value=currentYear,holidays[currentYear]||(holidays[currentYear]=[]),updateMonthSelectorDisplay(),renderCalendar()}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function formatDateForComparison(e){const t=e.getFullYear(),o=(e.getMonth()+1).toString().padStart(2,"0"),n=e.getDate().toString().padStart(2,"0");return`${t}-${o}-${n}`}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function formatFrenchDate(e){return e?e.toLocaleDateString("fr-FR",{weekday:"long",year:"numeric",month:"long",day:"numeric"}):""}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function getBookingsForDate(e){return bookings.filter(t=&gt;t.date===e)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.editBooking=function(e){const t=bookings.find(t=&gt;t.id===e);if(!t)return;window.editingBookingId=e,selectedDate=new Date(t.date.replace(/-/g,"/")),yearSelect.value=selectedDate.getFullYear(),currentYear=selectedDate.getFullYear(),currentMonth=selectedDate.getMonth(),currentDate=new Date(currentYear,currentMonth,1),updateMonthSelectorDisplay(),renderCalendar();const o=calendarGrid.querySelector(`[data-date="${formatDateForComparison(selectedDate)}"]`);o&amp;&amp;o.click();const[n,a]=t.startTime.split(":"),[s,l]=t.endTime.split(":");startHourSelect.value=n,startMinuteSelect.value=a,endHourSelect.value=s,endMinuteSelect.value=l,updateSelectedTimes(),aoReferenceInput.value=t.reference,aoObjectInput.value=t.object,bookSessionBtn.innerHTML='&lt;i class="fas fa-save mr-2"&gt;&lt;/i&gt; Modifier',bookingsTableModal.classList.add("hidden"),document.querySelector(".lg\\:col-span-1").scrollIntoView({behavior:"smooth"})}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// FONCTIONS D'EXPORT</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function exportToPdf() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (bookings.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification('Aucune réservation à exporter.', 'warning');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const doc = new window.jspdf.jsPDF();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sortedBookings = [...bookings].sort((a, b) =&gt; new Date(a.date) - new Date(b.date) || timeToMinutes(a.startTime) - timeToMinutes(b.startTime));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const tableColumns = ["N°", "Référence AO", "Objet", "Date", "Heure début", "Heure fin"];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const tableRows = sortedBookings.map((booking, index) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const bookingDate = new Date(booking.date.replace(/-/g, '/'));</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return [index + 1, booking.reference, booking.object, formatFrenchDate(bookingDate), booking.startTime, booking.endTime];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>doc.text("Liste des Réservations de Séances", 14, 15);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>doc.autoTable({head: [tableColumns], body: tableRows, startY: 20, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [67, 56, 202] }});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>doc.save('reservations_planning.pdf');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>showNotification('PDF généré avec succès !', 'success');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function exportToExcel() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (bookings.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showNotification('Aucune réservation à exporter.', 'warning');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sortedBookings = [...bookings].sort((a, b) =&gt; new Date(a.date) - new Date(b.date) || timeToMinutes(a.startTime) - timeToMinutes(b.startTime));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const dataForExcel = sortedBookings.map((booking, index) =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'N°': index + 1, 'Référence AO': booking.reference, 'Objet': booking.object,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'Date': formatFrenchDate(new Date(booking.date.replace(/-/g, '/'))), 'Heure de début': booking.startTime,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>'Heure de fin': booking.endTime, 'Date de création': new Date(booking.createdAt).toLocaleString('fr-FR')</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const worksheet = XLSX.utils.json_to_sheet(dataForExcel);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const objectMaxLength = Math.max(...dataForExcel.map(item =&gt; item.Objet.length), 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>worksheet['!cols'] = [{ wch: 5 }, { wch: 20 }, { wch: objectMaxLength }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 20 }];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const workbook = XLSX.utils.book_new();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>XLSX.utils.book_append_sheet(workbook, worksheet, 'Réservations');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>XLSX.writeFile(workbook, 'reservations_planning.xlsx');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>showNotification('Fichier Excel généré avec succès !', 'success');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// ANIMATIONS</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const animStyle = document.createElement('style');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>animStyle.textContent = `@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-10px); } } .animate-fade-in-up { animation: fadeInUp 0.3s ease-out forwards; } .animate-fade-out { animation: fadeOut 0.3s ease-out forwards; }`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.head.appendChild(animStyle);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// DÉMARRER L'APPLICATION</p>
+<p class="p1"><span class="Apple-converted-space">        </span>init();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
